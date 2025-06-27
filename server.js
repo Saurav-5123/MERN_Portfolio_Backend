@@ -8,32 +8,32 @@ const PORT = process.env.PORT || 5000;
 
 const Message = require("./models/Message");
 
-// ✅ CORS Setup (with origin for your frontend)
-app.use(cors({
-  origin: "http://localhost:5174", // <-- your frontend port (Vite)
-  methods: ["GET", "POST"],
-  credentials: true
-}));
+// ✅ CORS Setup (allow Vercel frontend)
+app.use(
+  cors({
+    origin: ["https://mern-portfolio.vercel.app"], // ← Your deployed frontend
+    methods: ["GET", "POST"],
+  })
+);
 
+// ✅ Body Parser
 app.use(express.json());
 
 // ✅ MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log("MongoDB Connected"))
-.catch((err) => console.error("MongoDB Error:", err));
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Error:", err));
 
 // ✅ Test Route
-app.get("/api/test", (req, res) => {
-  res.send("API is working!");
+app.get("/", (req, res) => {
+  res.send("MERN Portfolio Backend is Live ✅");
 });
 
-// ✅ POST route to receive messages
+// ✅ Message POST Route
 app.post("/api/messages", async (req, res) => {
   const { name, email, message } = req.body;
-  console.log("Incoming message:", req.body); // helpful for debug
+  console.log("Incoming message:", req.body);
   try {
     const newMessage = new Message({ name, email, message });
     await newMessage.save();
@@ -44,5 +44,7 @@ app.post("/api/messages", async (req, res) => {
   }
 });
 
-// ✅ Start server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ✅ Start the server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
